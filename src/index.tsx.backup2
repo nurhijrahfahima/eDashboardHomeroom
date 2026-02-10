@@ -11,8 +11,11 @@ const app = new Hono<{ Bindings: Bindings }>()
 // Enable CORS for frontend-backend communication
 app.use('/api/*', cors())
 
-// Serve static files - using root: './' for Cloudflare Pages
-app.use('/static/*', serveStatic({ root: './' }))
+// Serve static files
+app.get('/static/*', serveStatic({ root: './' }))
+app.get('/*.html', serveStatic({ root: './' }))
+app.get('/*.js', serveStatic({ root: './' }))
+app.get('/*.css', serveStatic({ root: './' }))
 
 // ========== API ROUTES ==========
 
@@ -249,7 +252,6 @@ app.get('/api/ahli/:homeroom_id/:id', async (c) => {
 app.post('/api/ahli', async (c) => {
   try {
     const data = await c.req.json()
-    console.log('[DEBUG] Create ahli data:', data)
     
     // Get next bilangan
     const maxBil = await c.env.DB.prepare(
@@ -257,7 +259,6 @@ app.post('/api/ahli', async (c) => {
     ).bind(data.homeroom_id).first()
     
     const nextBilangan = (maxBil?.max_bil || 0) + 1
-    console.log('[DEBUG] Next bilangan:', nextBilangan)
     
     const result = await c.env.DB.prepare(`
       INSERT INTO ahli_homeroom (
@@ -270,14 +271,12 @@ app.post('/api/ahli', async (c) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       data.homeroom_id, nextBilangan, data.nama_ahli, data.no_maktab,
-      data.jantina, data.kelas, data.jawatan_homeroom || null, data.no_bilik_asrama || null,
-      data.unit_beruniform || null, data.jawatan_beruniform || null, data.jawatan_beruniform_lain || null,
-      data.kelab_persatuan || null, data.jawatan_kelab || null, data.jawatan_kelab_lain || null,
-      data.sukan_permainan || null, data.jawatan_sukan || null, data.jawatan_sukan_lain || null,
-      data.sekretariat_skp || null, data.jawatan_skp || null
+      data.jantina, data.kelas, data.jawatan_homeroom, data.no_bilik_asrama,
+      data.unit_beruniform, data.jawatan_beruniform, data.jawatan_beruniform_lain,
+      data.kelab_persatuan, data.jawatan_kelab, data.jawatan_kelab_lain,
+      data.sukan_permainan, data.jawatan_sukan, data.jawatan_sukan_lain,
+      data.sekretariat_skp, data.jawatan_skp
     ).run()
-    
-    console.log('[DEBUG] Insert result:', result)
     
     return c.json({ 
       success: true, 
@@ -285,8 +284,7 @@ app.post('/api/ahli', async (c) => {
       id: result.meta.last_row_id 
     })
   } catch (error) {
-    console.error('[ERROR] Create ahli failed:', error)
-    return c.json({ success: false, message: 'Ralat sistem', error: String(error) }, 500)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
   }
 })
 
@@ -308,17 +306,16 @@ app.put('/api/ahli/:id', async (c) => {
       WHERE id = ?
     `).bind(
       data.nama_ahli, data.no_maktab, data.jantina, data.kelas,
-      data.jawatan_homeroom || null, data.no_bilik_asrama || null,
-      data.unit_beruniform || null, data.jawatan_beruniform || null, data.jawatan_beruniform_lain || null,
-      data.kelab_persatuan || null, data.jawatan_kelab || null, data.jawatan_kelab_lain || null,
-      data.sukan_permainan || null, data.jawatan_sukan || null, data.jawatan_sukan_lain || null,
-      data.sekretariat_skp || null, data.jawatan_skp || null,
+      data.jawatan_homeroom, data.no_bilik_asrama,
+      data.unit_beruniform, data.jawatan_beruniform, data.jawatan_beruniform_lain,
+      data.kelab_persatuan, data.jawatan_kelab, data.jawatan_kelab_lain,
+      data.sukan_permainan, data.jawatan_sukan, data.jawatan_sukan_lain,
+      data.sekretariat_skp, data.jawatan_skp,
       id
     ).run()
     
     return c.json({ success: true, message: 'Ahli berjaya dikemaskini' })
   } catch (error) {
-    console.error('[ERROR] Update ahli failed:', error)
     return c.json({ success: false, message: 'Ralat sistem' }, 500)
   }
 })
@@ -1534,312 +1531,6 @@ app.get('/aktiviti-tahunan', (c) => {
             document.getElementById('homeroomInfo').textContent = homeroom.nama_homeroom + ' - Tingkatan ' + homeroom.tingkatan;
         }
     </script>
-</body>
-</html>
-  `)
-})
-
-
-app.get('/ahli-homeroom', (c) => {
-  return c.html(`
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borang Senarai Ahli Homeroom - MRSM Ranau</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-green-600 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-4">
-                    <i class="fas fa-users text-2xl"></i>
-                    <div>
-                        <h1 class="text-xl font-bold">Borang Senarai Ahli Homeroom</h1>
-                        <p class="text-sm text-green-200" id="homeroomInfo"></p>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <p class="font-semibold" id="guruName"></p>
-                        <p class="text-sm text-green-200">Guru Homeroom</p>
-                    </div>
-                    <a href="/pengguna" class="bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Kembali
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    
-    <div class="container mx-auto px-4 py-8">
-        <!-- Add Button -->
-        <div class="mb-6">
-            <button onclick="showAddForm()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
-                <i class="fas fa-plus mr-2"></i>Tambah Ahli Baru
-            </button>
-        </div>
-        
-        <!-- Members Table -->
-        <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bil</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. Maktab</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jantina</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kelas</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jawatan</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody id="membersTable" class="bg-white divide-y divide-gray-200">
-                    <tr>
-                        <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                            Tiada ahli. Klik "Tambah Ahli Baru" untuk mulakan.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    
-    <!-- Add/Edit Modal -->
-    <div id="formModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full my-8">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold" id="modalTitle">Tambah Ahli Baru</h3>
-                    <button onclick="hideForm()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times text-2xl"></i>
-                    </button>
-                </div>
-                
-                <form id="memberForm" class="space-y-4">
-                    <input type="hidden" id="memberId">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Maklumat Asas -->
-                        <div class="col-span-2 bg-green-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-green-800 mb-3">Maklumat Asas</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Ahli *</label>
-                                    <input type="text" id="nama_ahli" required
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">No. Maktab *</label>
-                                    <input type="text" id="no_maktab" required
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jantina *</label>
-                                    <select id="jantina" required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                        <option value="">Pilih</option>
-                                        <option value="Lelaki">Lelaki</option>
-                                        <option value="Perempuan">Perempuan</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Kelas *</label>
-                                    <input type="text" id="kelas" required placeholder="Contoh: 4 AMANAH"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan Homeroom</label>
-                                    <select id="jawatan_homeroom" onchange="checkJawatanHomeroom()"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                        <option value="">Tiada</option>
-                                        <option value="PRESIDEN">PRESIDEN</option>
-                                        <option value="TIMBALAN PRESIDEN">TIMBALAN PRESIDEN</option>
-                                        <option value="SETIAUSAHA">SETIAUSAHA</option>
-                                        <option value="BENDAHARI">BENDAHARI</option>
-                                        <option value="AJK KHAS">AJK KHAS</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">No. Bilik Asrama</label>
-                                    <input type="text" id="no_bilik_asrama"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Unit Beruniform -->
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-blue-800 mb-3">Unit Beruniform</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
-                                    <select id="unit_beruniform"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Tiada</option>
-                                        <option value="Bulan Sabit Merah Malaysia">Bulan Sabit Merah Malaysia</option>
-                                        <option value="Kadet Bomba">Kadet Bomba</option>
-                                        <option value="Kadet Pertahanan Awam">Kadet Pertahanan Awam</option>
-                                        <option value="Kadet Polis">Kadet Polis</option>
-                                        <option value="Pandu Puteri">Pandu Puteri</option>
-                                        <option value="Pengakap">Pengakap</option>
-                                        <option value="Puteri Islam">Puteri Islam</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan</label>
-                                    <select id="jawatan_beruniform" onchange="checkJawatanBeruniform()"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Tiada</option>
-                                        <option value="PRESIDEN">PRESIDEN</option>
-                                        <option value="TIMBALAN PRESIDEN">TIMBALAN PRESIDEN</option>
-                                        <option value="SETIAUSAHA">SETIAUSAHA</option>
-                                        <option value="BENDAHARI">BENDAHARI</option>
-                                        <option value="AJK KHAS">AJK KHAS</option>
-                                    </select>
-                                </div>
-                                <div id="div_jawatan_beruniform_lain" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan (Nyatakan)</label>
-                                    <input type="text" id="jawatan_beruniform_lain"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Kelab/Persatuan -->
-                        <div class="bg-purple-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-purple-800 mb-3">Kelab/Persatuan</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Kelab</label>
-                                    <select id="kelab_persatuan"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                        <option value="">Tiada</option>
-                                        <option value="Bahasa Antarabangsa">Bahasa Antarabangsa</option>
-                                        <option value="Debat & Pengucapan Awam">Debat & Pengucapan Awam</option>
-                                        <option value="Masakan & Kulinari">Masakan & Kulinari</option>
-                                        <option value="Pencegahan Jenayah">Pencegahan Jenayah</option>
-                                        <option value="Pencinta Alam">Pencinta Alam</option>
-                                        <option value="Penggerak Digital">Penggerak Digital</option>
-                                        <option value="Robotik & KRUMS">Robotik & KRUMS</option>
-                                        <option value="Saintis Muda">Saintis Muda</option>
-                                        <option value="Seni Muzik & Kebudayaan">Seni Muzik & Kebudayaan</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan</label>
-                                    <select id="jawatan_kelab" onchange="checkJawatanKelab()"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                        <option value="">Tiada</option>
-                                        <option value="PRESIDEN">PRESIDEN</option>
-                                        <option value="TIMBALAN PRESIDEN">TIMBALAN PRESIDEN</option>
-                                        <option value="SETIAUSAHA">SETIAUSAHA</option>
-                                        <option value="BENDAHARI">BENDAHARI</option>
-                                        <option value="AJK KHAS">AJK KHAS</option>
-                                    </select>
-                                </div>
-                                <div id="div_jawatan_kelab_lain" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan (Nyatakan)</label>
-                                    <input type="text" id="jawatan_kelab_lain"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Sukan/Permainan -->
-                        <div class="bg-orange-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-orange-800 mb-3">Sukan/Permainan</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sukan</label>
-                                    <select id="sukan_permainan"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
-                                        <option value="">Tiada</option>
-                                        <option value="Badminton">Badminton</option>
-                                        <option value="Bola Jaring">Bola Jaring</option>
-                                        <option value="Bola Sepak">Bola Sepak</option>
-                                        <option value="Bola Tampar">Bola Tampar</option>
-                                        <option value="Catur">Catur</option>
-                                        <option value="Hoki">Hoki</option>
-                                        <option value="Olahraga">Olahraga</option>
-                                        <option value="Ragbi">Ragbi</option>
-                                        <option value="Silat">Silat</option>
-                                        <option value="Taekwando">Taekwando</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan</label>
-                                    <select id="jawatan_sukan" onchange="checkJawatanSukan()"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
-                                        <option value="">Tiada</option>
-                                        <option value="PRESIDEN">PRESIDEN</option>
-                                        <option value="TIMBALAN PRESIDEN">TIMBALAN PRESIDEN</option>
-                                        <option value="SETIAUSAHA">SETIAUSAHA</option>
-                                        <option value="BENDAHARI">BENDAHARI</option>
-                                        <option value="AJK KHAS">AJK KHAS</option>
-                                    </select>
-                                </div>
-                                <div id="div_jawatan_sukan_lain" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan (Nyatakan)</label>
-                                    <input type="text" id="jawatan_sukan_lain"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- SKP -->
-                        <div class="bg-red-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-red-800 mb-3">Sekretariat Kepimpinan Pelajar (SKP)</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sekretariat</label>
-                                    <select id="sekretariat_skp"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-                                        <option value="">Tiada</option>
-                                        <option value="BWP">BWP</option>
-                                        <option value="LDP">LDP</option>
-                                        <option value="PUM">PUM</option>
-                                        <option value="ALK">ALK</option>
-                                        <option value="BADAR">BADAR</option>
-                                        <option value="EMC">EMC</option>
-                                        <option value="JPA">JPA</option>
-                                        <option value="PRS">PRS</option>
-                                        <option value="PPSP">PPSP</option>
-                                        <option value="SRM">SRM</option>
-                                        <option value="BKM">BKM</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jawatan</label>
-                                    <input type="text" id="jawatan_skp"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
-                                           placeholder="Contoh: KETUA, TIMBALAN, AHLI">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex space-x-4 pt-4">
-                        <button type="submit" 
-                                class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
-                            <i class="fas fa-save mr-2"></i>Simpan
-                        </button>
-                        <button type="button" onclick="hideForm()" 
-                                class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-400 transition">
-                            <i class="fas fa-times mr-2"></i>Batal
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-    <script src="/static/ahli-homeroom.js"></script>
 </body>
 </html>
   `)

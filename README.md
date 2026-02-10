@@ -353,6 +353,41 @@ DELETE /api/ahli/:id                - Hapus ahli
 
 ---
 
+## ✅ UPDATE TERBARU (10 Feb 2026 - Part 3)
+
+### 🎯 CLICKABLE GURU NAME - DASHBOARD NAVIGATION
+
+**New Feature**: Klik nama guru untuk kembali ke dashboard
+- **Route agnostic**: Berfungsi dari mana-mana borang
+- **Role-based redirect**: 
+  - Admin → `/admin` (Dashboard Admin)
+  - Pengguna → `/pengguna-dashboard` (Dashboard Pengguna)
+
+**Updated Pages**:
+- ✅ `/pengguna-dashboard` - Dashboard Pengguna
+- ✅ `/ahli-homeroom` - Borang Senarai Ahli
+- ✅ `/laporan-mingguan` - Borang Laporan Mingguan
+
+**User Experience**:
+- Nama guru adalah clickable dengan cursor pointer
+- Hover effect: text menjadi lebih terang (green-200)
+- Auto detect role dari localStorage
+- Fallback ke homepage jika tiada user data
+
+**Implementation**:
+```javascript
+function goToDashboard() {
+    const userData = JSON.parse(localStorage.getItem('user'));
+    if (userData.role === 'admin') {
+        window.location.href = '/admin';
+    } else {
+        window.location.href = '/pengguna-dashboard';
+    }
+}
+```
+
+---
+
 ## ✅ UPDATE TERBARU (10 Feb 2026 - Part 2)
 
 ### 🎉 BORANG LAPORAN MINGGUAN HOMEROOM - COMPLETE!

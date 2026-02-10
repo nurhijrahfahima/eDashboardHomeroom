@@ -1,17 +1,58 @@
 # E-Dashboard Laporan Homeroom MRSM Ranau
 
 ## Gambaran Projek
-E-Dashboard Laporan Homeroom untuk MRSM Ranau adalah sistem pengurusan laporan homeroom yang komprehensif dengan dua panel akses:
-- **Panel Admin**: Untuk pentadbir menguruskan semua laporan homeroom
-- **Panel Pengguna**: Untuk pengguna melihat dan membaca laporan homeroom
+E-Dashboard Laporan Homeroom untuk MRSM Ranau adalah sistem pengurusan laporan homeroom yang komprehensif dengan **DUA BAHAGIAN BERASINGAN**:
+
+### 🟢 **Bahagian Pengguna** 
+**Untuk Guru Homeroom**
+- Lihat laporan homeroom mereka
+- Filter mengikut jenis laporan
+- Lihat butiran lengkap
+- Dashboard statistik
+- **Akses**: Read-only (lihat sahaja)
+
+### 🔵 **Bahagian Admin**
+**Untuk Pentadbir**
+- Urus SEMUA laporan homeroom
+- Tambah, edit, hapus laporan
+- Lihat laporan semua homeroom
+- Dashboard penuh statistik
+- **Akses**: Full control (CRUD)
 
 ## URLs
-- **Development**: https://3000-i7nkasdlhthnnls3d1hzr-8f57ffe2.sandbox.novita.ai
+- **Halaman Utama**: https://3000-i7nkasdlhthnnls3d1hzr-8f57ffe2.sandbox.novita.ai
+- **Login Pengguna**: https://3000-i7nkasdlhthnnls3d1hzr-8f57ffe2.sandbox.novita.ai/pengguna/login
+- **Login Admin**: https://3000-i7nkasdlhthnnls3d1hzr-8f57ffe2.sandbox.novita.ai/admin/login
 - **GitHub**: (Akan dikemaskini selepas push)
+
+## Struktur Aplikasi
+
+### 🏠 **Halaman Utama** (`/`)
+Landing page dengan 2 pilihan:
+- **Card Bahagian Pengguna** (hijau) → untuk guru homeroom
+- **Card Bahagian Admin** (biru) → untuk pentadbir
+
+### 🟢 **Bahagian Pengguna**
+- **Login**: `/pengguna/login` - Halaman login khusus pengguna
+- **Dashboard**: `/pengguna` - Panel pengguna selepas login
+- **Warna tema**: Hijau/Green
+- **Akses**: Read-only, lihat laporan sahaja
+
+### 🔵 **Bahagian Admin**
+- **Login**: `/admin/login` - Halaman login khusus admin
+- **Dashboard**: `/admin` - Panel admin selepas login
+- **Warna tema**: Indigo/Blue
+- **Akses**: Full control, CRUD semua laporan
 
 ## Ciri-ciri Utama
 
 ### ✅ Ciri-ciri Yang Telah Siap
+
+#### Sistem Navigasi
+- ✅ Landing page dengan 2 bahagian yang jelas
+- ✅ Login pages berasingan untuk Pengguna dan Admin
+- ✅ Role-based access control
+- ✅ Back button untuk kembali ke halaman utama
 
 #### Panel Admin
 - ✅ Dashboard statistik (jumlah laporan mengikut jenis)
@@ -126,23 +167,42 @@ Sistem mengandungi **28 homeroom** merangkumi semua tingkatan dengan guru homero
 
 ## Cara Menggunakan
 
-### Login
+### 🏠 Langkah 1: Halaman Utama
 1. Buka URL aplikasi
-2. Masukkan username dan password
-3. Sistem akan redirect ke panel yang sesuai mengikut role
+2. Pilih bahagian yang sesuai:
+   - **Bahagian Pengguna** (hijau) - untuk guru homeroom
+   - **Bahagian Admin** (biru) - untuk pentadbir
 
-### Panel Admin
-1. **Lihat Dashboard**: Statistik laporan dipaparkan di bahagian atas
-2. **Filter Laporan**: Gunakan dropdown untuk filter mengikut homeroom atau jenis
-3. **Tambah Laporan**: Klik butang "Tambah Laporan Baru"
-4. **Edit Laporan**: Klik ikon edit (hijau) pada laporan
-5. **Hapus Laporan**: Klik ikon hapus (merah) - laporan akan diarkibkan
-6. **Lihat Butiran**: Klik ikon mata (biru) untuk lihat butiran penuh
+### 🟢 Untuk Pengguna (Guru Homeroom)
+1. Klik **"Masuk Bahagian Pengguna"**
+2. Login dengan credentials pengguna
+3. Lihat dashboard dengan statistik
+4. Filter laporan mengikut homeroom atau jenis
+5. Klik "Lihat Butiran" untuk baca laporan penuh
 
-### Panel Pengguna
-1. **Lihat Dashboard**: Statistik laporan dipaparkan di bahagian atas
-2. **Filter Laporan**: Gunakan dropdown untuk filter mengikut homeroom atau jenis
-3. **Lihat Butiran**: Klik butang "Lihat Butiran" pada setiap kad laporan
+### 🔵 Untuk Admin (Pentadbir)
+1. Klik **"Masuk Bahagian Admin"**
+2. Login dengan credentials admin
+3. Lihat dashboard dengan statistik lengkap
+4. **Tambah Laporan**: Klik butang "Tambah Laporan Baru"
+5. **Edit Laporan**: Klik ikon edit (hijau) pada laporan
+6. **Hapus Laporan**: Klik ikon hapus (merah) - laporan akan diarkibkan
+7. **Lihat Butiran**: Klik ikon mata (biru) untuk lihat butiran penuh
+8. **Filter**: Gunakan dropdown untuk filter mengikut homeroom atau jenis
+
+## Perbezaan Bahagian Pengguna vs Admin
+
+| Ciri | Bahagian Pengguna | Bahagian Admin |
+|------|-------------------|----------------|
+| **Warna Tema** | 🟢 Hijau | 🔵 Biru |
+| **Login URL** | `/pengguna/login` | `/admin/login` |
+| **Lihat Laporan** | ✅ Ya | ✅ Ya |
+| **Tambah Laporan** | ❌ Tidak | ✅ Ya |
+| **Edit Laporan** | ❌ Tidak | ✅ Ya |
+| **Hapus Laporan** | ❌ Tidak | ✅ Ya |
+| **Filter** | ✅ Ya | ✅ Ya |
+| **Dashboard** | ✅ Statistik | ✅ Statistik Penuh |
+| **Akses** | Read-only | Full Control |
 
 ## Deployment
 

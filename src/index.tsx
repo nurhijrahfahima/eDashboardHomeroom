@@ -64,7 +64,7 @@ app.get('/api/laporan', async (c) => {
     const status = c.req.query('status') || 'aktif'
     
     let query = `
-      SELECT l.*, h.nama_homeroom, h.tingkatan, u.nama_penuh as created_by_name
+      SELECT l.*, h.nama_homeroom, h.tingkatan, h.nama_guru, u.nama_penuh as created_by_name
       FROM laporan l
       JOIN homeroom h ON l.homeroom_id = h.id
       JOIN users u ON l.created_by = u.id
@@ -98,7 +98,7 @@ app.get('/api/laporan/:id', async (c) => {
     const id = c.req.param('id')
     
     const laporan = await c.env.DB.prepare(`
-      SELECT l.*, h.nama_homeroom, h.tingkatan, u.nama_penuh as created_by_name
+      SELECT l.*, h.nama_homeroom, h.tingkatan, h.nama_guru, u.nama_penuh as created_by_name
       FROM laporan l
       JOIN homeroom h ON l.homeroom_id = h.id
       JOIN users u ON l.created_by = u.id
@@ -275,7 +275,7 @@ app.get('/', (c) => {
                             <i class="fas fa-info-circle mr-2"></i>Akaun Demo:
                         </p>
                         <div class="text-xs text-gray-600 space-y-1">
-                            <p><strong>Admin:</strong> admin / admin123</p>
+                            <p><strong>Admin:</strong> JKUPHRMRSMR / UPHRMRSMRanau</p>
                             <p><strong>Pengguna:</strong> pengguna1 / user123</p>
                         </div>
                     </div>
@@ -572,8 +572,8 @@ app.get('/admin', (c) => {
                     const formSelect = document.getElementById('homeroom_id');
                     
                     homerooms.forEach(hr => {
-                        const option1 = new Option(\`\${hr.nama_homeroom} (\${hr.tingkatan})\`, hr.id);
-                        const option2 = new Option(\`\${hr.nama_homeroom} (\${hr.tingkatan})\`, hr.id);
+                        const option1 = new Option(\`\${hr.tingkatan} - \${hr.nama_guru} (\${hr.nama_homeroom})\`, hr.id);
+                        const option2 = new Option(\`\${hr.tingkatan} - \${hr.nama_guru} (\${hr.nama_homeroom})\`, hr.id);
                         filterSelect.add(option1);
                         formSelect.add(option2);
                     });
@@ -640,7 +640,7 @@ app.get('/admin', (c) => {
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     \${item.nama_homeroom}<br>
-                                    <span class="text-xs text-gray-500">\${item.tingkatan}</span>
+                                    <span class="text-xs text-gray-500">\${item.tingkatan} - \${item.nama_guru}</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full \${badge}">\${item.jenis_laporan}</span>
@@ -966,7 +966,7 @@ app.get('/pengguna', (c) => {
                     const filterSelect = document.getElementById('filterHomeroom');
                     
                     homerooms.forEach(hr => {
-                        const option = new Option(\`\${hr.nama_homeroom} (\${hr.tingkatan})\`, hr.id);
+                        const option = new Option(\`\${hr.tingkatan} - \${hr.nama_guru} (\${hr.nama_homeroom})\`, hr.id);
                         filterSelect.add(option);
                     });
                 } catch (error) {
@@ -1039,7 +1039,8 @@ app.get('/pengguna', (c) => {
                                         </div>
                                         <h3 class="text-lg font-semibold text-gray-800 mb-2">\${item.tajuk}</h3>
                                         <p class="text-sm text-gray-600 mb-2">
-                                            <i class="fas fa-home mr-2"></i>\${item.nama_homeroom} - \${item.tingkatan}
+                                            <i class="fas fa-home mr-2"></i>\${item.nama_homeroom} - \${item.tingkatan}<br>
+                                            <i class="fas fa-chalkboard-teacher mr-2"></i>\${item.nama_guru}
                                         </p>
                                         <p class="text-sm text-gray-700">\${item.perkara.substring(0, 150)}...</p>
                                     </div>
@@ -1100,6 +1101,10 @@ app.get('/pengguna', (c) => {
                                 <p class="text-sm">
                                     <span class="font-semibold text-gray-700">Homeroom:</span>
                                     <span class="text-gray-600">\${laporan.nama_homeroom} - \${laporan.tingkatan}</span>
+                                </p>
+                                <p class="text-sm">
+                                    <span class="font-semibold text-gray-700">Guru Homeroom:</span>
+                                    <span class="text-gray-600">\${laporan.nama_guru}</span>
                                 </p>
                                 <p class="text-sm">
                                     <span class="font-semibold text-gray-700">Dibuat oleh:</span>

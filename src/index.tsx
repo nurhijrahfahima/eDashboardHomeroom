@@ -209,6 +209,127 @@ app.get('/api/statistik', async (c) => {
   }
 })
 
+// ========== API AHLI HOMEROOM ==========
+
+// API: Get all ahli by homeroom
+app.get('/api/ahli/:homeroom_id', async (c) => {
+  try {
+    const homeroomId = c.req.param('homeroom_id')
+    
+    const result = await c.env.DB.prepare(
+      'SELECT * FROM ahli_homeroom WHERE homeroom_id = ? ORDER BY bilangan'
+    ).bind(homeroomId).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Get single ahli
+app.get('/api/ahli/:homeroom_id/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    
+    const ahli = await c.env.DB.prepare(
+      'SELECT * FROM ahli_homeroom WHERE id = ?'
+    ).bind(id).first()
+    
+    if (!ahli) {
+      return c.json({ success: false, message: 'Ahli tidak dijumpai' }, 404)
+    }
+    
+    return c.json({ success: true, data: ahli })
+  } catch (error) {
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Create ahli
+app.post('/api/ahli', async (c) => {
+  try {
+    const data = await c.req.json()
+    
+    // Get next bilangan
+    const maxBil = await c.env.DB.prepare(
+      'SELECT MAX(bilangan) as max_bil FROM ahli_homeroom WHERE homeroom_id = ?'
+    ).bind(data.homeroom_id).first()
+    
+    const nextBilangan = (maxBil?.max_bil || 0) + 1
+    
+    const result = await c.env.DB.prepare(`
+      INSERT INTO ahli_homeroom (
+        homeroom_id, bilangan, nama_ahli, no_maktab, jantina, kelas,
+        jawatan_homeroom, no_bilik_asrama,
+        unit_beruniform, jawatan_beruniform, jawatan_beruniform_lain,
+        kelab_persatuan, jawatan_kelab, jawatan_kelab_lain,
+        sukan_permainan, jawatan_sukan, jawatan_sukan_lain,
+        sekretariat_skp, jawatan_skp
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      data.homeroom_id, nextBilangan, data.nama_ahli, data.no_maktab,
+      data.jantina, data.kelas, data.jawatan_homeroom, data.no_bilik_asrama,
+      data.unit_beruniform, data.jawatan_beruniform, data.jawatan_beruniform_lain,
+      data.kelab_persatuan, data.jawatan_kelab, data.jawatan_kelab_lain,
+      data.sukan_permainan, data.jawatan_sukan, data.jawatan_sukan_lain,
+      data.sekretariat_skp, data.jawatan_skp
+    ).run()
+    
+    return c.json({ 
+      success: true, 
+      message: 'Ahli berjaya ditambah',
+      id: result.meta.last_row_id 
+    })
+  } catch (error) {
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Update ahli
+app.put('/api/ahli/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const data = await c.req.json()
+    
+    await c.env.DB.prepare(`
+      UPDATE ahli_homeroom SET
+        nama_ahli = ?, no_maktab = ?, jantina = ?, kelas = ?,
+        jawatan_homeroom = ?, no_bilik_asrama = ?,
+        unit_beruniform = ?, jawatan_beruniform = ?, jawatan_beruniform_lain = ?,
+        kelab_persatuan = ?, jawatan_kelab = ?, jawatan_kelab_lain = ?,
+        sukan_permainan = ?, jawatan_sukan = ?, jawatan_sukan_lain = ?,
+        sekretariat_skp = ?, jawatan_skp = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      data.nama_ahli, data.no_maktab, data.jantina, data.kelas,
+      data.jawatan_homeroom, data.no_bilik_asrama,
+      data.unit_beruniform, data.jawatan_beruniform, data.jawatan_beruniform_lain,
+      data.kelab_persatuan, data.jawatan_kelab, data.jawatan_kelab_lain,
+      data.sukan_permainan, data.jawatan_sukan, data.jawatan_sukan_lain,
+      data.sekretariat_skp, data.jawatan_skp,
+      id
+    ).run()
+    
+    return c.json({ success: true, message: 'Ahli berjaya dikemaskini' })
+  } catch (error) {
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Delete ahli
+app.delete('/api/ahli/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    
+    await c.env.DB.prepare('DELETE FROM ahli_homeroom WHERE id = ?').bind(id).run()
+    
+    return c.json({ success: true, message: 'Ahli berjaya dibuang' })
+  } catch (error) {
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
 // ========== PAGE ROUTES ==========
 
 // Home page - Landing with two sections

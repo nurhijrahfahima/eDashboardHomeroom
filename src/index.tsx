@@ -1501,31 +1501,181 @@ app.get('/laporan-mingguan', (c) => {
     </nav>
     
     <div class="container mx-auto px-4 py-8">
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl"></i>
+        <div class="mb-6 flex justify-between items-center">
+            <div>
+                <p class="text-sm text-gray-600">Jumlah Ahli: <span id="jumlah_ahli" class="font-bold">0</span></p>
+            </div>
+            <button onclick="showAddForm()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-plus mr-2"></i>Tambah Laporan Baru
+            </button>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pertemuan</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tarikh</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hari</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tema</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kehadiran</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tindakan</th>
+                    </tr>
+                </thead>
+                <tbody id="laporanTable" class="bg-white divide-y divide-gray-200">
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Memuat data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Form Modal -->
+    <div id="formModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full my-8 max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold" id="modalTitle">Tambah Laporan Mingguan</h3>
+                    <button onclick="hideForm()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
                 </div>
-                <div class="ml-3">
-                    <h3 class="text-lg font-medium text-yellow-800">
-                        Borang Dalam Pembangunan
-                    </h3>
-                    <div class="mt-2 text-sm text-yellow-700">
-                        <p>Borang Laporan Mingguan Homeroom sedang dalam proses pembangunan.</p>
-                        <p class="mt-2">Akan siap tidak lama lagi!</p>
+                
+                <form id="laporanForm" onsubmit="saveLaporan(event)" class="space-y-4">
+                    <!-- Maklumat Homeroom -->
+                    <div class="bg-green-50 p-4 rounded-lg space-y-3">
+                        <h4 class="font-bold text-green-800">Maklumat Homeroom</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Nama Homeroom</label>
+                                <input type="text" id="nama_homeroom" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tarikh *</label>
+                                <input type="date" id="tarikh" required class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Hari</label>
+                                <input type="text" id="hari" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Masa *</label>
+                                <input type="time" id="masa" required class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Tempat *</label>
+                                <input type="text" id="tempat" required placeholder="Contoh: Bilik Homeroom" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Kehadiran</label>
+                                <input type="number" id="kehadiran" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Ketidakhadiran</label>
+                            <div class="flex gap-2">
+                                <select id="ketidakhadiran_select" class="flex-1 px-3 py-2 border rounded-lg">
+                                    <option value="">-- Pilih Ahli --</option>
+                                </select>
+                                <button type="button" onclick="addKetidakhadiran()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="ketidakhadiranList" class="mt-2 space-y-2"></div>
+                        </div>
                     </div>
-                </div>
+                    
+                    <!-- Kandungan Pertemuan -->
+                    <div class="bg-blue-50 p-4 rounded-lg space-y-3">
+                        <h4 class="font-bold text-blue-800">Kandungan Pertemuan</h4>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Tema *</label>
+                            <input type="text" id="tema" required class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Tajuk *</label>
+                            <input type="text" id="tajuk" required class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Penerangan Aktiviti *</label>
+                            <textarea id="penerangan_aktiviti" required rows="4" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Galeri (Optional) -->
+                    <div class="bg-purple-50 p-4 rounded-lg space-y-3">
+                        <h4 class="font-bold text-purple-800">Galeri (Tidak Wajib)</h4>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">URL Gambar/Video</label>
+                            <input type="url" id="galeri_url" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Caption</label>
+                            <input type="text" id="galeri_caption" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <!-- Refleksi -->
+                    <div class="bg-yellow-50 p-4 rounded-lg space-y-3">
+                        <h4 class="font-bold text-yellow-800">Refleksi</h4>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Refleksi Pelajar * (Max 500 perkataan)</label>
+                            <textarea id="refleksi_pelajar" required rows="4" maxlength="3000" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Refleksi Guru * (Max 500 perkataan)</label>
+                            <textarea id="refleksi_guru" required rows="4" maxlength="3000" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Metadata -->
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-3">
+                        <h4 class="font-bold text-gray-800">Metadata</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Disediakan Oleh (Setiausaha)</label>
+                                <input type="text" id="disediakan_oleh" class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Disemak Oleh (Guru)</label>
+                                <input type="text" id="disemak_oleh" class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button type="submit" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
+                            <i class="fas fa-save mr-2"></i>Simpan
+                        </button>
+                        <button type="button" onclick="hideForm()" class="px-6 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-semibold">
+                            Batal
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
     
-    <script>
-        const homeroom = JSON.parse(localStorage.getItem('currentHomeroom') || '{}');
-        if (homeroom.nama_guru) {
-            document.getElementById('guruName').textContent = homeroom.nama_guru;
-            document.getElementById('homeroomInfo').textContent = homeroom.nama_homeroom + ' - Tingkatan ' + homeroom.tingkatan;
-        }
-    </script>
+    <!-- View Modal -->
+    <div id="viewModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full my-8 max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Butiran Laporan</h3>
+                    <button onclick="hideView()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                <div id="viewContent"></div>
+                <button onclick="hideView()" class="mt-4 w-full bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-semibold">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script src="/static/laporan-mingguan.js"></script>
 </body>
 </html>
   `)

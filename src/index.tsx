@@ -211,7 +211,7 @@ app.get('/api/statistik', async (c) => {
 
 // ========== PAGE ROUTES ==========
 
-// Home page with login
+// Home page - Landing with two sections
 app.get('/', (c) => {
   return c.html(`
     <!DOCTYPE html>
@@ -225,14 +225,129 @@ app.get('/', (c) => {
     </head>
     <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div class="container mx-auto px-4 py-8">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <div class="inline-block bg-white p-6 rounded-full shadow-lg mb-4">
+                    <i class="fas fa-school text-6xl text-indigo-600"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-3">E-Dashboard Laporan Homeroom</h1>
+                <p class="text-xl text-gray-600">MRSM Ranau</p>
+                <p class="text-sm text-gray-500 mt-2">Sistem Pengurusan Laporan Homeroom</p>
+            </div>
+            
+            <!-- Two Sections -->
+            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Bahagian Pengguna -->
+                <div class="bg-white rounded-lg shadow-xl p-8 hover:shadow-2xl transition-shadow">
+                    <div class="text-center mb-6">
+                        <div class="inline-block bg-green-100 p-4 rounded-full mb-4">
+                            <i class="fas fa-users text-5xl text-green-600"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Bahagian Pengguna</h2>
+                        <p class="text-gray-600 text-sm">Untuk Guru Homeroom</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Lihat laporan homeroom anda</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Filter mengikut jenis laporan</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Lihat butiran lengkap laporan</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Dashboard statistik</p>
+                        </div>
+                    </div>
+                    
+                    <a href="/pengguna/login" 
+                       class="block w-full bg-green-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Masuk Bahagian Pengguna
+                    </a>
+                </div>
+                
+                <!-- Bahagian Admin -->
+                <div class="bg-white rounded-lg shadow-xl p-8 hover:shadow-2xl transition-shadow">
+                    <div class="text-center mb-6">
+                        <div class="inline-block bg-indigo-100 p-4 rounded-full mb-4">
+                            <i class="fas fa-user-shield text-5xl text-indigo-600"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Bahagian Admin</h2>
+                        <p class="text-gray-600 text-sm">Untuk Pentadbir</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Urus semua laporan homeroom</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Tambah, edit, hapus laporan</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Lihat laporan semua homeroom</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-500 mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">Dashboard penuh statistik</p>
+                        </div>
+                    </div>
+                    
+                    <a href="/admin/login" 
+                       class="block w-full bg-indigo-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Masuk Bahagian Admin
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Footer Info -->
+            <div class="mt-12 text-center">
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Pilih bahagian yang sesuai untuk log masuk ke sistem
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `)
+})
+
+// Pengguna Login Page
+app.get('/pengguna/login', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ms">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login Bahagian Pengguna - MRSM Ranau</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
             <div class="max-w-md mx-auto">
+                <!-- Back Button -->
+                <a href="/" class="inline-flex items-center text-green-600 hover:text-green-800 mb-6">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali ke Halaman Utama
+                </a>
+                
                 <!-- Header -->
                 <div class="text-center mb-8">
                     <div class="inline-block bg-white p-4 rounded-full shadow-lg mb-4">
-                        <i class="fas fa-school text-5xl text-indigo-600"></i>
+                        <i class="fas fa-users text-5xl text-green-600"></i>
                     </div>
-                    <h1 class="text-3xl font-bold text-gray-800 mb-2">E-Dashboard Laporan Homeroom</h1>
-                    <p class="text-gray-600">MRSM Ranau</p>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Bahagian Pengguna</h1>
+                    <p class="text-gray-600">Login untuk Guru Homeroom</p>
                 </div>
                 
                 <!-- Login Card -->
@@ -251,7 +366,7 @@ app.get('/', (c) => {
                                 <i class="fas fa-user mr-2"></i>Nama Pengguna
                             </label>
                             <input type="text" id="username" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                    placeholder="Masukkan nama pengguna" required>
                         </div>
                         
@@ -260,12 +375,12 @@ app.get('/', (c) => {
                                 <i class="fas fa-lock mr-2"></i>Kata Laluan
                             </label>
                             <input type="password" id="password" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                    placeholder="Masukkan kata laluan" required>
                         </div>
                         
                         <button type="submit" 
-                                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200">
+                                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200">
                             <i class="fas fa-sign-in-alt mr-2"></i>Log Masuk
                         </button>
                     </form>
@@ -274,9 +389,9 @@ app.get('/', (c) => {
                         <p class="text-sm text-gray-600 font-semibold mb-2">
                             <i class="fas fa-info-circle mr-2"></i>Akaun Demo:
                         </p>
-                        <div class="text-xs text-gray-600 space-y-1">
-                            <p><strong>Admin:</strong> JKUPHRMRSMR / UPHRMRSMRanau</p>
-                            <p><strong>Pengguna:</strong> pengguna1 / user123</p>
+                        <div class="text-xs text-gray-600">
+                            <p><strong>Username:</strong> pengguna1</p>
+                            <p><strong>Password:</strong> user123</p>
                         </div>
                     </div>
                 </div>
@@ -299,15 +414,127 @@ app.get('/', (c) => {
                     const response = await axios.post('/api/login', { username, password });
                     
                     if (response.data.success) {
-                        // Store user info
-                        localStorage.setItem('user', JSON.stringify(response.data.user));
-                        
-                        // Redirect based on role
-                        if (response.data.user.role === 'admin') {
-                            window.location.href = '/admin';
-                        } else {
-                            window.location.href = '/pengguna';
+                        if (response.data.user.role !== 'pengguna') {
+                            errorMsg.classList.remove('hidden');
+                            errorText.textContent = 'Akaun ini bukan untuk bahagian pengguna';
+                            return;
                         }
+                        
+                        localStorage.setItem('user', JSON.stringify(response.data.user));
+                        window.location.href = '/pengguna';
+                    }
+                } catch (error) {
+                    errorMsg.classList.remove('hidden');
+                    errorText.textContent = error.response?.data?.message || 'Ralat log masuk';
+                }
+            });
+        </script>
+    </body>
+    </html>
+  `)
+})
+
+// Admin Login Page
+app.get('/admin/login', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ms">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login Bahagian Admin - MRSM Ranau</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gradient-to-br from-indigo-50 to-blue-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto">
+                <!-- Back Button -->
+                <a href="/" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali ke Halaman Utama
+                </a>
+                
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <div class="inline-block bg-white p-4 rounded-full shadow-lg mb-4">
+                        <i class="fas fa-user-shield text-5xl text-indigo-600"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Bahagian Admin</h1>
+                    <p class="text-gray-600">Login untuk Pentadbir</p>
+                </div>
+                
+                <!-- Login Card -->
+                <div class="bg-white rounded-lg shadow-xl p-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Log Masuk
+                    </h2>
+                    
+                    <div id="errorMsg" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <span id="errorText"></span>
+                    </div>
+                    
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-user mr-2"></i>ID Pentadbir
+                            </label>
+                            <input type="text" id="username" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                   placeholder="Masukkan ID pentadbir" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-lock mr-2"></i>Kata Laluan
+                            </label>
+                            <input type="password" id="password" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                   placeholder="Masukkan kata laluan" required>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Log Masuk
+                        </button>
+                    </form>
+                    
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600 font-semibold mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>Akaun Demo:
+                        </p>
+                        <div class="text-xs text-gray-600">
+                            <p><strong>ID:</strong> JKUPHRMRSMR</p>
+                            <p><strong>Password:</strong> UPHRMRSMRanau</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const errorMsg = document.getElementById('errorMsg');
+                const errorText = document.getElementById('errorText');
+                
+                errorMsg.classList.add('hidden');
+                
+                try {
+                    const response = await axios.post('/api/login', { username, password });
+                    
+                    if (response.data.success) {
+                        if (response.data.user.role !== 'admin') {
+                            errorMsg.classList.remove('hidden');
+                            errorText.textContent = 'Akaun ini bukan untuk bahagian admin';
+                            return;
+                        }
+                        
+                        localStorage.setItem('user', JSON.stringify(response.data.user));
+                        window.location.href = '/admin';
                     }
                 } catch (error) {
                     errorMsg.classList.remove('hidden');

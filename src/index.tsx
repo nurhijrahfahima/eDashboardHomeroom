@@ -329,7 +329,7 @@ app.get('/pengguna/login', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login Bahagian Pengguna - MRSM Ranau</title>
+        <title>Pilih Panel - Bahagian Pengguna MRSM Ranau</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     </head>
@@ -347,52 +347,44 @@ app.get('/pengguna/login', (c) => {
                         <i class="fas fa-users text-5xl text-green-600"></i>
                     </div>
                     <h1 class="text-3xl font-bold text-gray-800 mb-2">Bahagian Pengguna</h1>
-                    <p class="text-gray-600">Login untuk Guru Homeroom</p>
+                    <p class="text-gray-600">Pilih Panel Guru Homeroom</p>
                 </div>
                 
-                <!-- Login Card -->
+                <!-- Selection Card -->
                 <div class="bg-white rounded-lg shadow-xl p-8">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Log Masuk
+                        <i class="fas fa-chalkboard-teacher mr-2"></i>Pilih Nama Guru
                     </h2>
                     
                     <div id="errorMsg" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                         <span id="errorText"></span>
                     </div>
                     
-                    <form id="loginForm" class="space-y-4">
+                    <form id="selectForm" class="space-y-4">
                         <div>
                             <label class="block text-gray-700 font-medium mb-2">
-                                <i class="fas fa-user mr-2"></i>Nama Pengguna
+                                <i class="fas fa-user-tie mr-2"></i>Nama Guru Homeroom
                             </label>
-                            <input type="text" id="username" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                   placeholder="Masukkan nama pengguna" required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">
-                                <i class="fas fa-lock mr-2"></i>Kata Laluan
-                            </label>
-                            <input type="password" id="password" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                   placeholder="Masukkan kata laluan" required>
+                            <select id="guruSelect" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
+                                    required>
+                                <option value="">-- Pilih Nama Guru --</option>
+                            </select>
                         </div>
                         
                         <button type="submit" 
                                 class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200">
-                            <i class="fas fa-sign-in-alt mr-2"></i>Log Masuk
+                            <i class="fas fa-sign-in-alt mr-2"></i>Masuk Panel
                         </button>
                     </form>
                     
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <p class="text-sm text-gray-600 font-semibold mb-2">
-                            <i class="fas fa-info-circle mr-2"></i>Akaun Demo:
+                    <div class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                        <p class="text-sm text-green-700 font-semibold mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>Maklumat:
                         </p>
-                        <div class="text-xs text-gray-600">
-                            <p><strong>Username:</strong> pengguna1</p>
-                            <p><strong>Password:</strong> user123</p>
-                        </div>
+                        <p class="text-xs text-green-600">
+                            Pilih nama guru dari senarai untuk masuk ke panel. Tiada kata laluan diperlukan untuk Bahagian Pengguna.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -400,34 +392,85 @@ app.get('/pengguna/login', (c) => {
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script>
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            // Load list of teachers from homeroom
+            async function loadGuru() {
+                try {
+                    const response = await axios.get('/api/homeroom');
+                    const homerooms = response.data.data;
+                    const select = document.getElementById('guruSelect');
+                    
+                    // Group by tingkatan
+                    const grouped = {};
+                    homerooms.forEach(hr => {
+                        if (!grouped[hr.tingkatan]) {
+                            grouped[hr.tingkatan] = [];
+                        }
+                        grouped[hr.tingkatan].push(hr);
+                    });
+                    
+                    // Add options grouped by tingkatan
+                    Object.keys(grouped).sort().forEach(tingkatan => {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = tingkatan;
+                        
+                        grouped[tingkatan].forEach(hr => {
+                            const option = document.createElement('option');
+                            option.value = JSON.stringify({
+                                homeroom_id: hr.id,
+                                nama_guru: hr.nama_guru,
+                                nama_homeroom: hr.nama_homeroom,
+                                tingkatan: hr.tingkatan
+                            });
+                            option.textContent = \`\${hr.nama_guru} (\${hr.nama_homeroom})\`;
+                            optgroup.appendChild(option);
+                        });
+                        
+                        select.appendChild(optgroup);
+                    });
+                } catch (error) {
+                    console.error('Error loading guru:', error);
+                }
+            }
+            
+            document.getElementById('selectForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
+                const selectValue = document.getElementById('guruSelect').value;
                 const errorMsg = document.getElementById('errorMsg');
                 const errorText = document.getElementById('errorText');
+                
+                if (!selectValue) {
+                    errorMsg.classList.remove('hidden');
+                    errorText.textContent = 'Sila pilih nama guru';
+                    return;
+                }
                 
                 errorMsg.classList.add('hidden');
                 
                 try {
-                    const response = await axios.post('/api/login', { username, password });
+                    const guruData = JSON.parse(selectValue);
                     
-                    if (response.data.success) {
-                        if (response.data.user.role !== 'pengguna') {
-                            errorMsg.classList.remove('hidden');
-                            errorText.textContent = 'Akaun ini bukan untuk bahagian pengguna';
-                            return;
-                        }
-                        
-                        localStorage.setItem('user', JSON.stringify(response.data.user));
-                        window.location.href = '/pengguna';
-                    }
+                    // Create a pseudo-user object for pengguna
+                    const user = {
+                        id: 'guru_' + guruData.homeroom_id,
+                        username: guruData.nama_guru,
+                        nama_penuh: guruData.nama_guru,
+                        role: 'pengguna',
+                        homeroom_id: guruData.homeroom_id,
+                        nama_homeroom: guruData.nama_homeroom,
+                        tingkatan: guruData.tingkatan
+                    };
+                    
+                    localStorage.setItem('user', JSON.stringify(user));
+                    window.location.href = '/pengguna';
                 } catch (error) {
                     errorMsg.classList.remove('hidden');
-                    errorText.textContent = error.response?.data?.message || 'Ralat log masuk';
+                    errorText.textContent = 'Ralat memproses pilihan';
                 }
             });
+            
+            // Load guru on page load
+            loadGuru();
         </script>
     </body>
     </html>

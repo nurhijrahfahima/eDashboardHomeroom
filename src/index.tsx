@@ -2285,4 +2285,353 @@ app.delete('/api/pencapaian/:id', async (c) => {
   }
 })
 
+// ============================================================
+// API ENDPOINTS: AKTIVITI TAHUNAN HOMEROOM (3 BAHAGIAN)
+// ============================================================
+
+// ============================
+// AKTIVITI BIASA
+// ============================
+
+// API: Get all aktiviti_biasa for homeroom
+app.get('/api/aktiviti-biasa/:homeroom_id', async (c) => {
+  try {
+    const { homeroom_id } = c.req.param()
+    const { env } = c
+    
+    const { results } = await env.DB.prepare(`
+      SELECT * FROM aktiviti_biasa 
+      WHERE homeroom_id = ? 
+      ORDER BY tarikh DESC, bilangan DESC
+    `).bind(homeroom_id).all()
+    
+    return c.json({ success: true, data: results })
+  } catch (error) {
+    console.error('Error fetching aktiviti biasa:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Get single aktiviti_biasa
+app.get('/api/aktiviti-biasa/:homeroom_id/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const { env } = c
+    
+    const result = await env.DB.prepare(`
+      SELECT * FROM aktiviti_biasa WHERE id = ?
+    `).bind(id).first()
+    
+    return c.json({ success: true, data: result })
+  } catch (error) {
+    console.error('Error fetching aktiviti biasa:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Create aktiviti_biasa
+app.post('/api/aktiviti-biasa', async (c) => {
+  try {
+    const data = await c.req.json()
+    const { env } = c
+    
+    // Auto-increment bilangan
+    const { count } = await env.DB.prepare(`
+      SELECT COUNT(*) as count FROM aktiviti_biasa WHERE homeroom_id = ?
+    `).bind(data.homeroom_id).first() as { count: number }
+    
+    const bilangan = (count || 0) + 1
+    
+    const result = await env.DB.prepare(`
+      INSERT INTO aktiviti_biasa (
+        homeroom_id, bilangan, tarikh, hari, masa, nama_aktiviti, tempat, catatan,
+        gambar1_url, gambar1_caption, gambar2_url, gambar2_caption, gambar3_url, gambar3_caption,
+        disediakan_oleh, disemak_oleh
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      data.homeroom_id, bilangan, data.tarikh, data.hari, data.masa, data.nama_aktiviti, 
+      data.tempat, data.catatan || null,
+      data.gambar1_url || null, data.gambar1_caption || null,
+      data.gambar2_url || null, data.gambar2_caption || null,
+      data.gambar3_url || null, data.gambar3_caption || null,
+      data.disediakan_oleh, data.disemak_oleh
+    ).run()
+    
+    return c.json({ success: true, id: result.meta.last_row_id, bilangan, message: 'Aktiviti berjaya ditambah' })
+  } catch (error) {
+    console.error('Error creating aktiviti biasa:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Update aktiviti_biasa
+app.put('/api/aktiviti-biasa/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const data = await c.req.json()
+    const { env } = c
+    
+    await env.DB.prepare(`
+      UPDATE aktiviti_biasa SET
+        tarikh = ?, hari = ?, masa = ?, nama_aktiviti = ?, tempat = ?, catatan = ?,
+        gambar1_url = ?, gambar1_caption = ?, gambar2_url = ?, gambar2_caption = ?,
+        gambar3_url = ?, gambar3_caption = ?, disediakan_oleh = ?, disemak_oleh = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      data.tarikh, data.hari, data.masa, data.nama_aktiviti, data.tempat, data.catatan || null,
+      data.gambar1_url || null, data.gambar1_caption || null,
+      data.gambar2_url || null, data.gambar2_caption || null,
+      data.gambar3_url || null, data.gambar3_caption || null,
+      data.disediakan_oleh, data.disemak_oleh, id
+    ).run()
+    
+    return c.json({ success: true, message: 'Aktiviti berjaya dikemaskini' })
+  } catch (error) {
+    console.error('Error updating aktiviti biasa:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Delete aktiviti_biasa
+app.delete('/api/aktiviti-biasa/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const { env } = c
+    
+    await env.DB.prepare(`DELETE FROM aktiviti_biasa WHERE id = ?`).bind(id).run()
+    
+    return c.json({ success: true, message: 'Aktiviti berjaya dibuang' })
+  } catch (error) {
+    console.error('Error deleting aktiviti biasa:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// ============================
+// AKTIVITI KEUSAHAWANAN
+// ============================
+
+// API: Get all aktiviti_keusahawanan for homeroom
+app.get('/api/aktiviti-keusahawanan/:homeroom_id', async (c) => {
+  try {
+    const { homeroom_id } = c.req.param()
+    const { env } = c
+    
+    const { results } = await env.DB.prepare(`
+      SELECT * FROM aktiviti_keusahawanan 
+      WHERE homeroom_id = ? 
+      ORDER BY tarikh DESC, bilangan DESC
+    `).bind(homeroom_id).all()
+    
+    return c.json({ success: true, data: results })
+  } catch (error) {
+    console.error('Error fetching aktiviti keusahawanan:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Get single aktiviti_keusahawanan
+app.get('/api/aktiviti-keusahawanan/:homeroom_id/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const { env } = c
+    
+    const result = await env.DB.prepare(`
+      SELECT * FROM aktiviti_keusahawanan WHERE id = ?
+    `).bind(id).first()
+    
+    return c.json({ success: true, data: result })
+  } catch (error) {
+    console.error('Error fetching aktiviti keusahawanan:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Create aktiviti_keusahawanan
+app.post('/api/aktiviti-keusahawanan', async (c) => {
+  try {
+    const data = await c.req.json()
+    const { env } = c
+    
+    // Auto-increment bilangan
+    const { count } = await env.DB.prepare(`
+      SELECT COUNT(*) as count FROM aktiviti_keusahawanan WHERE homeroom_id = ?
+    `).bind(data.homeroom_id).first() as { count: number }
+    
+    const bilangan = (count || 0) + 1
+    
+    const result = await env.DB.prepare(`
+      INSERT INTO aktiviti_keusahawanan (
+        homeroom_id, bilangan, tarikh, hari, masa, nama_aktiviti, tempat, keuntungan, catatan,
+        gambar_url, gambar_caption, disediakan_oleh, disemak_oleh
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      data.homeroom_id, bilangan, data.tarikh, data.hari, data.masa, data.nama_aktiviti, 
+      data.tempat, data.keuntungan, data.catatan || null,
+      data.gambar_url || null, data.gambar_caption || null,
+      data.disediakan_oleh, data.disemak_oleh
+    ).run()
+    
+    return c.json({ success: true, id: result.meta.last_row_id, bilangan, message: 'Aktiviti berjaya ditambah' })
+  } catch (error) {
+    console.error('Error creating aktiviti keusahawanan:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Update aktiviti_keusahawanan
+app.put('/api/aktiviti-keusahawanan/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const data = await c.req.json()
+    const { env } = c
+    
+    await env.DB.prepare(`
+      UPDATE aktiviti_keusahawanan SET
+        tarikh = ?, hari = ?, masa = ?, nama_aktiviti = ?, tempat = ?, keuntungan = ?, catatan = ?,
+        gambar_url = ?, gambar_caption = ?, disediakan_oleh = ?, disemak_oleh = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      data.tarikh, data.hari, data.masa, data.nama_aktiviti, data.tempat, data.keuntungan, data.catatan || null,
+      data.gambar_url || null, data.gambar_caption || null,
+      data.disediakan_oleh, data.disemak_oleh, id
+    ).run()
+    
+    return c.json({ success: true, message: 'Aktiviti berjaya dikemaskini' })
+  } catch (error) {
+    console.error('Error updating aktiviti keusahawanan:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Delete aktiviti_keusahawanan
+app.delete('/api/aktiviti-keusahawanan/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const { env } = c
+    
+    await env.DB.prepare(`DELETE FROM aktiviti_keusahawanan WHERE id = ?`).bind(id).run()
+    
+    return c.json({ success: true, message: 'Aktiviti berjaya dibuang' })
+  } catch (error) {
+    console.error('Error deleting aktiviti keusahawanan:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// ============================
+// AKTIVITI KHIDMAT MASYARAKAT
+// ============================
+
+// API: Get all aktiviti_khidmat for homeroom
+app.get('/api/aktiviti-khidmat/:homeroom_id', async (c) => {
+  try {
+    const { homeroom_id } = c.req.param()
+    const { env } = c
+    
+    const { results } = await env.DB.prepare(`
+      SELECT * FROM aktiviti_khidmat 
+      WHERE homeroom_id = ? 
+      ORDER BY tarikh DESC, bilangan DESC
+    `).bind(homeroom_id).all()
+    
+    return c.json({ success: true, data: results })
+  } catch (error) {
+    console.error('Error fetching aktiviti khidmat:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Get single aktiviti_khidmat
+app.get('/api/aktiviti-khidmat/:homeroom_id/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const { env } = c
+    
+    const result = await env.DB.prepare(`
+      SELECT * FROM aktiviti_khidmat WHERE id = ?
+    `).bind(id).first()
+    
+    return c.json({ success: true, data: result })
+  } catch (error) {
+    console.error('Error fetching aktiviti khidmat:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Create aktiviti_khidmat
+app.post('/api/aktiviti-khidmat', async (c) => {
+  try {
+    const data = await c.req.json()
+    const { env } = c
+    
+    // Auto-increment bilangan
+    const { count } = await env.DB.prepare(`
+      SELECT COUNT(*) as count FROM aktiviti_khidmat WHERE homeroom_id = ?
+    `).bind(data.homeroom_id).first() as { count: number }
+    
+    const bilangan = (count || 0) + 1
+    
+    const result = await env.DB.prepare(`
+      INSERT INTO aktiviti_khidmat (
+        homeroom_id, bilangan, tarikh, hari, masa, nama_aktiviti, tempat, objektif, impak, catatan,
+        gambar_url, gambar_caption, disediakan_oleh, disemak_oleh
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      data.homeroom_id, bilangan, data.tarikh, data.hari, data.masa, data.nama_aktiviti, 
+      data.tempat, data.objektif, data.impak, data.catatan || null,
+      data.gambar_url || null, data.gambar_caption || null,
+      data.disediakan_oleh, data.disemak_oleh
+    ).run()
+    
+    return c.json({ success: true, id: result.meta.last_row_id, bilangan, message: 'Aktiviti berjaya ditambah' })
+  } catch (error) {
+    console.error('Error creating aktiviti khidmat:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Update aktiviti_khidmat
+app.put('/api/aktiviti-khidmat/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const data = await c.req.json()
+    const { env } = c
+    
+    await env.DB.prepare(`
+      UPDATE aktiviti_khidmat SET
+        tarikh = ?, hari = ?, masa = ?, nama_aktiviti = ?, tempat = ?, objektif = ?, impak = ?, catatan = ?,
+        gambar_url = ?, gambar_caption = ?, disediakan_oleh = ?, disemak_oleh = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      data.tarikh, data.hari, data.masa, data.nama_aktiviti, data.tempat, data.objektif, data.impak, data.catatan || null,
+      data.gambar_url || null, data.gambar_caption || null,
+      data.disediakan_oleh, data.disemak_oleh, id
+    ).run()
+    
+    return c.json({ success: true, message: 'Aktiviti berjaya dikemaskini' })
+  } catch (error) {
+    console.error('Error updating aktiviti khidmat:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Delete aktiviti_khidmat
+app.delete('/api/aktiviti-khidmat/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const { env } = c
+    
+    await env.DB.prepare(`DELETE FROM aktiviti_khidmat WHERE id = ?`).bind(id).run()
+    
+    return c.json({ success: true, message: 'Aktiviti berjaya dibuang' })
+  } catch (error) {
+    console.error('Error deleting aktiviti khidmat:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
 export default app

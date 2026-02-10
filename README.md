@@ -350,3 +350,54 @@ DELETE /api/ahli/:id                - Hapus ahli
 2. Deploy to Cloudflare Pages
 3. Add more features as required
 
+
+---
+
+## ✅ UPDATE TERBARU (10 Feb 2026 - Part 2)
+
+### 🎉 BORANG LAPORAN MINGGUAN HOMEROOM - COMPLETE!
+**Route**: `/laporan-mingguan`
+
+**Full CRUD Operations**: ✅
+- CREATE - Auto pertemuan_ke increment
+- READ - List + Single item view
+- UPDATE - Edit existing laporan
+- DELETE - Remove laporan
+
+**20 Fields Lengkap**:
+1. **Maklumat Homeroom** (8): Nama (autofill), Tarikh (calendar), Hari (auto), Masa (24h), Tempat, Pertemuan ke (auto), Kehadiran (auto), Ketidakhadiran (dynamic list)
+2. **Kandungan** (3): Tema, Tajuk, Penerangan
+3. **Galeri** (2): URL, Caption (optional)
+4. **Refleksi** (2): Pelajar (500 words), Guru (500 words)
+5. **Metadata** (2): Disediakan oleh (autofill Setiausaha), Disemak oleh (autofill Guru)
+
+**Auto-fill Features**:
+- ✅ Nama Homeroom → from logged-in user
+- ✅ Hari → auto from tarikh selection  
+- ✅ Pertemuan ke → auto-increment from database
+- ✅ Kehadiran → auto-calculate from ketidakhadiran
+- ✅ Disediakan Oleh → auto from Setiausaha ahli
+- ✅ Disemak Oleh → auto from Guru Penasihat
+
+**Dynamic Features**:
+- ✅ Ketidakhadiran dropdown dengan Add button
+- ✅ Multiple ketidakhadiran support
+- ✅ Auto kehadiran calculation
+- ✅ View modal dengan full details
+- ✅ Edit & Delete actions
+
+**API Testing Results**:
+```
+✅ CREATE - Pertemuan ke auto-increment (1, 2, 3...)
+✅ READ   - List all + Get single
+✅ UPDATE - All fields updateable
+✅ DELETE - Soft delete working
+✅ Frontend - Full CRUD via UI
+```
+
+### 📊 Overall Progress
+- **Borang Senarai Ahli**: ✅ 100% Complete
+- **Borang Laporan Mingguan**: ✅ 100% Complete
+- **Borang Pencapaian**: 🚧 Placeholder
+- **Borang Aktiviti Tahunan**: 🚧 Placeholder
+

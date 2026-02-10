@@ -2135,4 +2135,154 @@ app.get('/ahli-homeroom', (c) => {
   `)
 })
 
+// ============================================
+// API ENDPOINTS - PENCAPAIAN AHLI
+// ============================================
+
+// API: Get all pencapaian for a homeroom
+app.get('/api/pencapaian/:homeroom_id', async (c) => {
+  try {
+    const { homeroom_id } = c.req.param()
+    const { env } = c
+    
+    const result = await env.DB.prepare(`
+      SELECT * FROM pencapaian_ahli 
+      WHERE homeroom_id = ? 
+      ORDER BY created_at DESC
+    `).bind(homeroom_id).all()
+    
+    return c.json({
+      success: true,
+      data: result.results || []
+    })
+  } catch (error) {
+    console.error('Error fetching pencapaian:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Get single pencapaian
+app.get('/api/pencapaian/:homeroom_id/:id', async (c) => {
+  try {
+    const { homeroom_id, id } = c.req.param()
+    const { env } = c
+    
+    const result = await env.DB.prepare(`
+      SELECT * FROM pencapaian_ahli 
+      WHERE homeroom_id = ? AND id = ?
+    `).bind(homeroom_id, id).first()
+    
+    return c.json({
+      success: true,
+      data: result || null
+    })
+  } catch (error) {
+    console.error('Error fetching pencapaian:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Create new pencapaian
+app.post('/api/pencapaian', async (c) => {
+  try {
+    const data = await c.req.json()
+    const { env } = c
+    
+    const result = await env.DB.prepare(`
+      INSERT INTO pencapaian_ahli (
+        homeroom_id, nama_pelajar, no_maktab, png,
+        nama_aktiviti, peringkat, pencapaian,
+        galeri_url, galeri_caption,
+        disediakan_oleh, disemak_oleh
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      data.homeroom_id,
+      data.nama_pelajar,
+      data.no_maktab,
+      data.png || null,
+      data.nama_aktiviti,
+      data.peringkat,
+      data.pencapaian,
+      data.galeri_url || null,
+      data.galeri_caption || null,
+      data.disediakan_oleh || null,
+      data.disemak_oleh || null
+    ).run()
+    
+    return c.json({
+      success: true,
+      message: 'Pencapaian berjaya ditambah',
+      id: result.meta.last_row_id
+    })
+  } catch (error) {
+    console.error('Error creating pencapaian:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Update pencapaian
+app.put('/api/pencapaian/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const data = await c.req.json()
+    const { env } = c
+    
+    await env.DB.prepare(`
+      UPDATE pencapaian_ahli SET
+        nama_pelajar = ?,
+        no_maktab = ?,
+        png = ?,
+        nama_aktiviti = ?,
+        peringkat = ?,
+        pencapaian = ?,
+        galeri_url = ?,
+        galeri_caption = ?,
+        disediakan_oleh = ?,
+        disemak_oleh = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      data.nama_pelajar,
+      data.no_maktab,
+      data.png || null,
+      data.nama_aktiviti,
+      data.peringkat,
+      data.pencapaian,
+      data.galeri_url || null,
+      data.galeri_caption || null,
+      data.disediakan_oleh || null,
+      data.disemak_oleh || null,
+      id
+    ).run()
+    
+    return c.json({
+      success: true,
+      message: 'Pencapaian berjaya dikemaskini'
+    })
+  } catch (error) {
+    console.error('Error updating pencapaian:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Delete pencapaian
+app.delete('/api/pencapaian/:id', async (c) => {
+  try {
+    const { id } = c.req.param()
+    const { env } = c
+    
+    await env.DB.prepare(`
+      DELETE FROM pencapaian_ahli WHERE id = ?
+    `).bind(id).run()
+    
+    return c.json({
+      success: true,
+      message: 'Pencapaian berjaya dibuang'
+    })
+  } catch (error) {
+    console.error('Error deleting pencapaian:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
 export default app

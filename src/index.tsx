@@ -12,7 +12,10 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.use('/api/*', cors())
 
 // Serve static files
-app.use('/static/*', serveStatic({ root: './public' }))
+app.get('/static/*', serveStatic({ root: './' }))
+app.get('/*.html', serveStatic({ root: './' }))
+app.get('/*.js', serveStatic({ root: './' }))
+app.get('/*.css', serveStatic({ root: './' }))
 
 // ========== API ROUTES ==========
 
@@ -1175,364 +1178,163 @@ app.get('/admin', (c) => {
 })
 
 // User panel
+// Pengguna Dashboard
 app.get('/pengguna', (c) => {
+  return c.redirect('/pengguna-dashboard')
+})
+
+app.get('/pengguna-dashboard', (c) => {
   return c.html(`
-    <!DOCTYPE html>
-    <html lang="ms">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Panel Pengguna - MRSM Ranau</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    </head>
-    <body class="bg-gray-50">
-        <!-- Navigation -->
-        <nav class="bg-green-600 text-white shadow-lg">
-            <div class="container mx-auto px-4 py-4">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
-                        <i class="fas fa-school text-2xl"></i>
-                        <div>
-                            <h1 class="text-xl font-bold">Panel Pengguna</h1>
-                            <p class="text-sm text-green-200">E-Dashboard Laporan Homeroom MRSM Ranau</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right">
-                            <p class="font-semibold" id="userName"></p>
-                            <p class="text-sm text-green-200">Pengguna</p>
-                        </div>
-                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Log Keluar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        
-        <div class="container mx-auto px-4 py-8">
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center">
-                        <div class="bg-blue-100 p-3 rounded-full">
-                            <i class="fas fa-file-alt text-2xl text-blue-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Jumlah Laporan</p>
-                            <p class="text-2xl font-bold" id="totalLaporan">0</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center">
-                        <div class="bg-green-100 p-3 rounded-full">
-                            <i class="fas fa-user-check text-2xl text-green-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Kehadiran</p>
-                            <p class="text-2xl font-bold" id="kehadiranCount">0</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center">
-                        <div class="bg-yellow-100 p-3 rounded-full">
-                            <i class="fas fa-gavel text-2xl text-yellow-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Disiplin</p>
-                            <p class="text-2xl font-bold" id="disiplinCount">0</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center">
-                        <div class="bg-purple-100 p-3 rounded-full">
-                            <i class="fas fa-graduation-cap text-2xl text-purple-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Akademik</p>
-                            <p class="text-2xl font-bold" id="akademikCount">0</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Main Content -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">
-                        <i class="fas fa-clipboard-list mr-2"></i>Senarai Laporan Homeroom
-                    </h2>
-                </div>
-                
-                <!-- Filters -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pengguna - MRSM Ranau</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
+    <nav class="bg-green-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-school text-2xl"></i>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-2">Filter Homeroom</label>
-                        <select id="filterHomeroom" onchange="loadLaporan()" 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <option value="">Semua Homeroom</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-2">Filter Jenis</label>
-                        <select id="filterJenis" onchange="loadLaporan()" 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <option value="">Semua Jenis</option>
-                            <option value="kehadiran">Kehadiran</option>
-                            <option value="disiplin">Disiplin</option>
-                            <option value="akademik">Akademik</option>
-                            <option value="aktiviti">Aktiviti</option>
-                            <option value="umum">Umum</option>
-                        </select>
+                        <h1 class="text-xl font-bold">Dashboard Guru Homeroom</h1>
+                        <p class="text-sm text-green-200" id="homeroomInfo"></p>
                     </div>
                 </div>
-                
-                <!-- Laporan Cards -->
-                <div id="laporanList" class="space-y-4">
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="font-semibold" id="guruName"></p>
+                        <p class="text-sm text-green-200">Guru Homeroom</p>
+                    </div>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Log Keluar
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Detail Modal -->
-        <div id="detailModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold">Butiran Laporan</h3>
-                        <button onclick="hideDetail()" class="text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-times text-2xl"></i>
-                        </button>
-                    </div>
-                    
-                    <div id="detailContent" class="space-y-4">
-                    </div>
-                    
-                    <div class="mt-6">
-                        <button onclick="hideDetail()" 
-                                class="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-400 transition">
-                            <i class="fas fa-times mr-2"></i>Tutup
-                        </button>
-                    </div>
-                </div>
-            </div>
+    </nav>
+    
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-hand-sparkles text-yellow-500 mr-2"></i>
+                Selamat Datang!
+            </h2>
+            <p class="text-gray-600">
+                Pilih borang yang ingin diisi atau dikemaskini untuk homeroom anda.
+            </p>
         </div>
         
-        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script>
-            let currentUser = null;
-            let homerooms = [];
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <a href="/ahli-homeroom" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border-l-4 border-blue-500">
+                <div class="flex items-start">
+                    <div class="bg-blue-100 p-4 rounded-full mr-4">
+                        <i class="fas fa-users text-3xl text-blue-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                            1. Borang Senarai Ahli Homeroom
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-3">
+                            Senarai lengkap ahli homeroom dengan maklumat asas, unit beruniform, kelab, sukan dan SKP
+                        </p>
+                        <div class="flex items-center text-blue-600 font-semibold">
+                            <span class="mr-2">Buka Borang</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
             
-            // Check authentication
-            function checkAuth() {
-                const user = localStorage.getItem('user');
-                if (!user) {
-                    window.location.href = '/';
-                    return null;
-                }
-                
-                currentUser = JSON.parse(user);
-                document.getElementById('userName').textContent = currentUser.nama_penuh;
-                return currentUser;
-            }
+            <a href="/laporan-mingguan" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border-l-4 border-green-500">
+                <div class="flex items-start">
+                    <div class="bg-green-100 p-4 rounded-full mr-4">
+                        <i class="fas fa-calendar-week text-3xl text-green-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                            2. Borang Laporan Mingguan Homeroom
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-3">
+                            Laporan aktiviti dan perkembangan homeroom setiap minggu
+                        </p>
+                        <div class="flex items-center text-green-600 font-semibold">
+                            <span class="mr-2">Buka Borang</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
             
-            function logout() {
-                localStorage.removeItem('user');
+            <a href="/pencapaian-ahli" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border-l-4 border-purple-500">
+                <div class="flex items-start">
+                    <div class="bg-purple-100 p-4 rounded-full mr-4">
+                        <i class="fas fa-trophy text-3xl text-purple-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                            3. Borang Pencapaian Ahli Homeroom
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-3">
+                            Pencapaian akademik dan ko-kurikulum ahli homeroom
+                        </p>
+                        <div class="flex items-center text-purple-600 font-semibold">
+                            <span class="mr-2">Buka Borang</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/aktiviti-tahunan" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 border-l-4 border-orange-500">
+                <div class="flex items-start">
+                    <div class="bg-orange-100 p-4 rounded-full mr-4">
+                        <i class="fas fa-calendar-alt text-3xl text-orange-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                            4. Borang Aktiviti Tahunan Homeroom
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-3">
+                            Perancangan dan rekod aktiviti homeroom sepanjang tahun
+                        </p>
+                        <div class="flex items-center text-orange-600 font-semibold">
+                            <span class="mr-2">Buka Borang</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        function checkAuth() {
+            const user = localStorage.getItem('currentHomeroom');
+            if (!user) {
                 window.location.href = '/';
+                return null;
             }
-            
-            // Load homerooms
-            async function loadHomerooms() {
-                try {
-                    const response = await axios.get('/api/homeroom');
-                    homerooms = response.data.data;
-                    
-                    const filterSelect = document.getElementById('filterHomeroom');
-                    
-                    homerooms.forEach(hr => {
-                        const option = new Option(\`\${hr.tingkatan} - \${hr.nama_guru} (\${hr.nama_homeroom})\`, hr.id);
-                        filterSelect.add(option);
-                    });
-                } catch (error) {
-                    console.error('Error loading homerooms:', error);
-                }
-            }
-            
-            // Load statistics
-            async function loadStatistik() {
-                try {
-                    const homeroomId = document.getElementById('filterHomeroom').value;
-                    let url = '/api/statistik';
-                    if (homeroomId) url += \`?homeroom_id=\${homeroomId}\`;
-                    
-                    const response = await axios.get(url);
-                    const data = response.data.data;
-                    
-                    document.getElementById('totalLaporan').textContent = data.total;
-                    
-                    const jenisMap = {
-                        kehadiran: 0,
-                        disiplin: 0,
-                        akademik: 0
-                    };
-                    
-                    data.byJenis.forEach(item => {
-                        if (jenisMap.hasOwnProperty(item.jenis_laporan)) {
-                            jenisMap[item.jenis_laporan] = item.count;
-                        }
-                    });
-                    
-                    document.getElementById('kehadiranCount').textContent = jenisMap.kehadiran;
-                    document.getElementById('disiplinCount').textContent = jenisMap.disiplin;
-                    document.getElementById('akademikCount').textContent = jenisMap.akademik;
-                } catch (error) {
-                    console.error('Error loading statistik:', error);
-                }
-            }
-            
-            // Load laporan
-            async function loadLaporan() {
-                try {
-                    const homeroomId = document.getElementById('filterHomeroom').value;
-                    const jenis = document.getElementById('filterJenis').value;
-                    
-                    let url = '/api/laporan?';
-                    if (homeroomId) url += \`homeroom_id=\${homeroomId}&\`;
-                    if (jenis) url += \`jenis=\${jenis}&\`;
-                    
-                    const response = await axios.get(url);
-                    const laporan = response.data.data;
-                    
-                    const list = document.getElementById('laporanList');
-                    list.innerHTML = '';
-                    
-                    if (laporan.length === 0) {
-                        list.innerHTML = '<p class="text-center text-gray-500 py-8">Tiada laporan dijumpai</p>';
-                        return;
-                    }
-                    
-                    laporan.forEach(item => {
-                        const badge = getJenisBadge(item.jenis_laporan);
-                        const card = \`
-                            <div class="border border-gray-200 rounded-lg p-5 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-3">
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-3 mb-2">
-                                            <span class="px-3 py-1 text-xs font-semibold rounded-full \${badge}">\${item.jenis_laporan}</span>
-                                            <span class="text-sm text-gray-500">\${formatDate(item.tarikh_laporan)}</span>
-                                        </div>
-                                        <h3 class="text-lg font-semibold text-gray-800 mb-2">\${item.tajuk}</h3>
-                                        <p class="text-sm text-gray-600 mb-2">
-                                            <i class="fas fa-home mr-2"></i>\${item.nama_homeroom} - \${item.tingkatan}<br>
-                                            <i class="fas fa-chalkboard-teacher mr-2"></i>\${item.nama_guru}
-                                        </p>
-                                        <p class="text-sm text-gray-700">\${item.perkara.substring(0, 150)}...</p>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
-                                    <span class="text-xs text-gray-500">
-                                        <i class="fas fa-user mr-1"></i>Oleh: \${item.created_by_name}
-                                    </span>
-                                    <button onclick="viewDetail(\${item.id})" 
-                                            class="text-green-600 hover:text-green-800 font-semibold text-sm">
-                                        <i class="fas fa-eye mr-1"></i>Lihat Butiran
-                                    </button>
-                                </div>
-                            </div>
-                        \`;
-                        list.innerHTML += card;
-                    });
-                    
-                    loadStatistik();
-                } catch (error) {
-                    console.error('Error loading laporan:', error);
-                }
-            }
-            
-            function getJenisBadge(jenis) {
-                const badges = {
-                    kehadiran: 'bg-green-100 text-green-800',
-                    disiplin: 'bg-yellow-100 text-yellow-800',
-                    akademik: 'bg-purple-100 text-purple-800',
-                    aktiviti: 'bg-blue-100 text-blue-800',
-                    umum: 'bg-gray-100 text-gray-800'
-                };
-                return badges[jenis] || badges.umum;
-            }
-            
-            function formatDate(dateStr) {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' });
-            }
-            
-            async function viewDetail(id) {
-                try {
-                    const response = await axios.get(\`/api/laporan/\${id}\`);
-                    const laporan = response.data.data;
-                    
-                    const badge = getJenisBadge(laporan.jenis_laporan);
-                    
-                    const content = \`
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="flex items-center space-x-3 mb-3">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full \${badge}">\${laporan.jenis_laporan}</span>
-                                <span class="text-sm text-gray-600">\${formatDate(laporan.tarikh_laporan)}</span>
-                            </div>
-                            
-                            <h4 class="text-xl font-bold text-gray-800 mb-3">\${laporan.tajuk}</h4>
-                            
-                            <div class="space-y-2 mb-4">
-                                <p class="text-sm">
-                                    <span class="font-semibold text-gray-700">Homeroom:</span>
-                                    <span class="text-gray-600">\${laporan.nama_homeroom} - \${laporan.tingkatan}</span>
-                                </p>
-                                <p class="text-sm">
-                                    <span class="font-semibold text-gray-700">Guru Homeroom:</span>
-                                    <span class="text-gray-600">\${laporan.nama_guru}</span>
-                                </p>
-                                <p class="text-sm">
-                                    <span class="font-semibold text-gray-700">Dibuat oleh:</span>
-                                    <span class="text-gray-600">\${laporan.created_by_name}</span>
-                                </p>
-                                <p class="text-sm">
-                                    <span class="font-semibold text-gray-700">Tarikh dibuat:</span>
-                                    <span class="text-gray-600">\${formatDate(laporan.created_at)}</span>
-                                </p>
-                            </div>
-                            
-                            <div class="border-t pt-4">
-                                <h5 class="font-semibold text-gray-700 mb-2">Butiran Laporan:</h5>
-                                <p class="text-gray-700 whitespace-pre-line">\${laporan.perkara}</p>
-                            </div>
-                        </div>
-                    \`;
-                    
-                    document.getElementById('detailContent').innerHTML = content;
-                    document.getElementById('detailModal').classList.remove('hidden');
-                } catch (error) {
-                    alert('Ralat mendapatkan maklumat laporan');
-                }
-            }
-            
-            function hideDetail() {
-                document.getElementById('detailModal').classList.add('hidden');
-            }
-            
-            // Initialize
-            if (checkAuth()) {
-                loadHomerooms();
-                loadLaporan();
-            }
-        </script>
-    </body>
-    </html>
+            const homeroomData = JSON.parse(user);
+            document.getElementById('guruName').textContent = homeroomData.nama_guru;
+            document.getElementById('homeroomInfo').textContent = homeroomData.nama_homeroom + ' - Tingkatan ' + homeroomData.tingkatan;
+            return homeroomData;
+        }
+        
+        function logout() {
+            localStorage.removeItem('currentHomeroom');
+            window.location.href = '/';
+        }
+        
+        checkAuth();
+    </script>
+</body>
+</html>
   `)
 })
 

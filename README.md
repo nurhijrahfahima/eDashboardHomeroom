@@ -401,3 +401,30 @@ DELETE /api/ahli/:id                - Hapus ahli
 - **Borang Pencapaian**: 🚧 Placeholder
 - **Borang Aktiviti Tahunan**: 🚧 Placeholder
 
+
+---
+
+## 🔗 REPOSITORY & DEPLOYMENT
+
+### GitHub Repository
+- **URL**: https://github.com/nurhijrahfahima/eDashboardHomeroom
+- **Branch**: main
+- **Status**: ✅ Code pushed successfully
+- **Commits**: 11+ commits with full history
+
+### Git Commands
+```bash
+# Clone repository
+git clone https://github.com/nurhijrahfahima/eDashboardHomeroom.git
+
+# Pull latest changes
+git pull origin main
+
+# Push changes
+git add .
+git commit -m "Your message"
+git push origin main
+```
+
+---
+

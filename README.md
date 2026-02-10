@@ -91,15 +91,16 @@ Sistem menyokong 5 jenis laporan:
 
 ## Akaun Demo
 
-### Admin
+### 🟢 Bahagian Pengguna (Guru Homeroom)
+- **Tiada password diperlukan!**
+- Hanya pilih nama guru dari dropdown senarai
+- Senarai mengandungi semua 28 guru homeroom
+- Dikelompokkan mengikut tingkatan
+
+### 🔵 Bahagian Admin (Pentadbir)
 - Username: `JKUPHRMRSMR`
 - Password: `UPHRMRSMRanau`
 - Akses: Penuh (CRUD semua laporan)
-
-### Pengguna
-- Username: `pengguna1`
-- Password: `user123`
-- Akses: Read-only (lihat laporan sahaja)
 
 ## Data Homeroom
 
@@ -175,10 +176,11 @@ Sistem mengandungi **28 homeroom** merangkumi semua tingkatan dengan guru homero
 
 ### 🟢 Untuk Pengguna (Guru Homeroom)
 1. Klik **"Masuk Bahagian Pengguna"**
-2. Login dengan credentials pengguna
-3. Lihat dashboard dengan statistik
-4. Filter laporan mengikut homeroom atau jenis
-5. Klik "Lihat Butiran" untuk baca laporan penuh
+2. **Pilih nama guru** dari dropdown (dikelompokkan mengikut tingkatan)
+3. Klik "Masuk Panel" - **Tiada password diperlukan!**
+4. Lihat dashboard dengan statistik
+5. Filter laporan mengikut homeroom atau jenis
+6. Klik "Lihat Butiran" untuk baca laporan penuh
 
 ### 🔵 Untuk Admin (Pentadbir)
 1. Klik **"Masuk Bahagian Admin"**
@@ -196,6 +198,8 @@ Sistem mengandungi **28 homeroom** merangkumi semua tingkatan dengan guru homero
 |------|-------------------|----------------|
 | **Warna Tema** | 🟢 Hijau | 🔵 Biru |
 | **Login URL** | `/pengguna/login` | `/admin/login` |
+| **Login Method** | ✅ Pilih nama guru sahaja | 🔐 Username + Password |
+| **Password** | ❌ Tidak perlu | ✅ Ya |
 | **Lihat Laporan** | ✅ Ya | ✅ Ya |
 | **Tambah Laporan** | ❌ Tidak | ✅ Ya |
 | **Edit Laporan** | ❌ Tidak | ✅ Ya |

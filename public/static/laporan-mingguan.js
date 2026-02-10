@@ -320,5 +320,21 @@ function formatDate(dateStr) {
     return date.toLocaleDateString('ms-MY', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+function goToDashboard() {
+    const user = localStorage.getItem('user');
+    if (!user) {
+        window.location.href = '/';
+        return;
+    }
+    
+    const userData = JSON.parse(user);
+    // Check role and redirect accordingly
+    if (userData.role === 'admin') {
+        window.location.href = '/admin';
+    } else {
+        window.location.href = '/pengguna-dashboard';
+    }
+}
+
 // Initialize on load
 document.addEventListener('DOMContentLoaded', init);

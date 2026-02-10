@@ -1334,7 +1334,7 @@ app.get('/pengguna-dashboard', (c) => {
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="text-right">
-                        <p class="font-semibold" id="guruName"></p>
+                        <p class="font-semibold cursor-pointer hover:text-green-200 transition" id="guruName" onclick="goToDashboard()"></p>
                         <p class="text-sm text-green-200">Guru Homeroom</p>
                     </div>
                     <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition">
@@ -1456,6 +1456,22 @@ app.get('/pengguna-dashboard', (c) => {
         function logout() {
             localStorage.removeItem('currentHomeroom');
             window.location.href = '/';
+        }
+        
+        function goToDashboard() {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                window.location.href = '/';
+                return;
+            }
+            
+            const userData = JSON.parse(user);
+            // Check role and redirect accordingly
+            if (userData.role === 'admin') {
+                window.location.href = '/admin';
+            } else {
+                window.location.href = '/pengguna-dashboard';
+            }
         }
         
         checkAuth();

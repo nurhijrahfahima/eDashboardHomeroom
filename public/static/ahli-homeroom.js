@@ -231,6 +231,22 @@ document.getElementById('memberForm').addEventListener('submit', async (e) => {
     }
 });
 
+function goToDashboard() {
+    const user = localStorage.getItem('user');
+    if (!user) {
+        window.location.href = '/';
+        return;
+    }
+    
+    const userData = JSON.parse(user);
+    // Check role and redirect accordingly
+    if (userData.role === 'admin') {
+        window.location.href = '/admin';
+    } else {
+        window.location.href = '/pengguna-dashboard';
+    }
+}
+
 // Initialize
 if (checkAuth()) {
     loadMembers();

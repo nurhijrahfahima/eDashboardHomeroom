@@ -307,3 +307,46 @@ npm run deploy:prod
 ---
 
 Dibangunkan untuk MRSM Ranau dengan ❤️
+
+---
+
+## ✅ LATEST UPDATES (10 Feb 2026)
+
+### 🎉 BORANG SENARAI AHLI HOMEROOM - COMPLETED!
+**Route**: `/ahli-homeroom`
+
+**Full CRUD Operations**:
+- ✅ CREATE - Tambah ahli baru dengan auto-increment bilangan
+- ✅ READ - List semua ahli homeroom + get single ahli
+- ✅ UPDATE - Kemaskini maklumat ahli
+- ✅ DELETE - Buang ahli
+
+**11 Fields**:
+1. Maklumat Asas (6): Nama, No. Maktab, Jantina, Kelas, Jawatan Homeroom, No. Bilik
+2. Unit Beruniform (3): Unit, Jawatan, Jawatan Lain
+3. Kelab/Persatuan (3): Kelab, Jawatan, Jawatan Lain
+4. Sukan/Permainan (3): Sukan, Jawatan, Jawatan Lain
+5. SKP (2): Sekretariat, Jawatan
+
+**API Endpoints**:
+```
+GET    /api/ahli/:homeroom_id       - List semua ahli
+GET    /api/ahli/:homeroom_id/:id   - Get ahli by ID
+POST   /api/ahli                    - Tambah ahli baru
+PUT    /api/ahli/:id                - Update ahli
+DELETE /api/ahli/:id                - Hapus ahli
+```
+
+### 📊 Progress Summary
+- **Panel Pengguna Dashboard**: ✅ 100% Complete
+- **Borang Senarai Ahli**: ✅ 100% Complete (CRUD fully functional)
+- **3 Borang Lagi**: 🚧 Placeholder (akan dibangunkan)
+- **Panel Admin**: ✅ 100% Complete
+- **Database**: ✅ Complete dengan migrations
+- **API Endpoints**: ✅ All working
+
+### 🎯 Next Steps (Optional)
+1. Develop 3 remaining forms (Laporan Mingguan, Pencapaian, Aktiviti)
+2. Deploy to Cloudflare Pages
+3. Add more features as required
+

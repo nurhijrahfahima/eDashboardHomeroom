@@ -51,8 +51,8 @@ Sistem menyokong 5 jenis laporan:
 ## Akaun Demo
 
 ### Admin
-- Username: `admin`
-- Password: `admin123`
+- Username: `JKUPHRMRSMR`
+- Password: `UPHRMRSMRanau`
 - Akses: Penuh (CRUD semua laporan)
 
 ### Pengguna
@@ -60,13 +60,55 @@ Sistem menyokong 5 jenis laporan:
 - Password: `user123`
 - Akses: Read-only (lihat laporan sahaja)
 
+## Data Homeroom
+
+Sistem mengandungi **28 homeroom** merangkumi semua tingkatan dengan guru homeroom masing-masing:
+
+### Tingkatan 1 (6 Homeroom)
+1. Homeroom 1A - Ustaz Firdaus
+2. Homeroom 1B - Cikgu Dayang
+3. Homeroom 1C - Cikgu Ady
+4. Homeroom 1D - Cikgu Dominic
+5. Homeroom 1E - Cikgu Ismail
+6. Homeroom 1F - Cikgu Kylie
+
+### Tingkatan 2 (5 Homeroom)
+1. Homeroom 2A - Cikgu Nelson
+2. Homeroom 2B - Cikgu Nurhijrah
+3. Homeroom 2C - Ustaz Izzat
+4. Homeroom 2D - Cikgu Norazliana
+5. Homeroom 2E - Cikgu Noorfitri
+
+### Tingkatan 3 (6 Homeroom)
+1. Homeroom 3A - Cikgu Noorhayani
+2. Homeroom 3B - Cikgu Amira
+3. Homeroom 3C - Cikgu Jasman
+4. Homeroom 3D - Cikgu Asrul
+5. Homeroom 3E - Cikgu Sharin
+6. Homeroom 3F - Cikgu Noorhaineh
+
+### Tingkatan 4 (6 Homeroom)
+1. Homeroom 4A - Cikgu Celestine
+2. Homeroom 4B - Cikgu Amran
+3. Homeroom 4C - Cikgu Rafidah
+4. Homeroom 4D - Cikgu Juliah
+5. Homeroom 4E - Cikgu Hilmi
+6. Homeroom 4F - Cikgu Aphelmina
+
+### Tingkatan 5 (5 Homeroom)
+1. Homeroom 5A - Cikgu Azlan
+2. Homeroom 5B - Cikgu Azwa
+3. Homeroom 5C - Cikgu Audry
+4. Homeroom 5D - Cikgu Faishal
+5. Homeroom 5E - Cikgu Amanina
+
 ## Struktur Database
 
 ### Jadual Users
 - id, username, password, nama_penuh, role, created_at
 
 ### Jadual Homeroom
-- id, nama_homeroom, tingkatan, tahun_akademik, created_at
+- id, nama_homeroom, tingkatan, tahun_akademik, nama_guru, created_at
 
 ### Jadual Laporan
 - id, homeroom_id, tarikh_laporan, jenis_laporan, tajuk, perkara, status, created_by, created_at, updated_at

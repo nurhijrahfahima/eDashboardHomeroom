@@ -336,6 +336,130 @@ app.delete('/api/ahli/:id', async (c) => {
   }
 })
 
+// ========== API LAPORAN MINGGUAN ==========
+
+// API: Get all laporan mingguan for homeroom
+app.get('/api/laporan-mingguan/:homeroom_id', async (c) => {
+  try {
+    const homeroom_id = c.req.param('homeroom_id')
+    
+    const results = await c.env.DB.prepare(`
+      SELECT * FROM laporan_mingguan 
+      WHERE homeroom_id = ? 
+      ORDER BY tarikh DESC, pertemuan_ke DESC
+    `).bind(homeroom_id).all()
+    
+    return c.json({ success: true, data: results.results })
+  } catch (error) {
+    console.error('[ERROR] Get laporan mingguan failed:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Get single laporan mingguan
+app.get('/api/laporan-mingguan/:homeroom_id/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    
+    const result = await c.env.DB.prepare(
+      'SELECT * FROM laporan_mingguan WHERE id = ?'
+    ).bind(id).first()
+    
+    if (!result) {
+      return c.json({ success: false, message: 'Laporan tidak dijumpai' }, 404)
+    }
+    
+    return c.json({ success: true, data: result })
+  } catch (error) {
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Create laporan mingguan
+app.post('/api/laporan-mingguan', async (c) => {
+  try {
+    const data = await c.req.json()
+    console.log('[DEBUG] Create laporan mingguan:', data)
+    
+    // Get next pertemuan_ke
+    const maxPertemuan = await c.env.DB.prepare(
+      'SELECT MAX(pertemuan_ke) as max_pertemuan FROM laporan_mingguan WHERE homeroom_id = ?'
+    ).bind(data.homeroom_id).first()
+    
+    const nextPertemuan = (maxPertemuan?.max_pertemuan || 0) + 1
+    
+    const result = await c.env.DB.prepare(`
+      INSERT INTO laporan_mingguan (
+        homeroom_id, nama_homeroom, tarikh, hari, masa, tempat, pertemuan_ke,
+        kehadiran, ketidakhadiran, tema, tajuk, penerangan_aktiviti,
+        galeri_url, galeri_caption, refleksi_pelajar, refleksi_guru,
+        disediakan_oleh, disemak_oleh
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      data.homeroom_id, data.nama_homeroom, data.tarikh, data.hari, data.masa,
+      data.tempat, nextPertemuan, data.kehadiran, data.ketidakhadiran || null,
+      data.tema, data.tajuk, data.penerangan_aktiviti,
+      data.galeri_url || null, data.galeri_caption || null,
+      data.refleksi_pelajar, data.refleksi_guru,
+      data.disediakan_oleh || null, data.disemak_oleh || null
+    ).run()
+    
+    return c.json({ 
+      success: true, 
+      message: 'Laporan mingguan berjaya ditambah',
+      id: result.meta.last_row_id,
+      pertemuan_ke: nextPertemuan
+    })
+  } catch (error) {
+    console.error('[ERROR] Create laporan mingguan failed:', error)
+    return c.json({ success: false, message: 'Ralat sistem', error: String(error) }, 500)
+  }
+})
+
+// API: Update laporan mingguan
+app.put('/api/laporan-mingguan/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const data = await c.req.json()
+    
+    await c.env.DB.prepare(`
+      UPDATE laporan_mingguan SET
+        nama_homeroom = ?, tarikh = ?, hari = ?, masa = ?, tempat = ?,
+        kehadiran = ?, ketidakhadiran = ?, tema = ?, tajuk = ?,
+        penerangan_aktiviti = ?, galeri_url = ?, galeri_caption = ?,
+        refleksi_pelajar = ?, refleksi_guru = ?,
+        disediakan_oleh = ?, disemak_oleh = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      data.nama_homeroom, data.tarikh, data.hari, data.masa, data.tempat,
+      data.kehadiran, data.ketidakhadiran || null, data.tema, data.tajuk,
+      data.penerangan_aktiviti, data.galeri_url || null, data.galeri_caption || null,
+      data.refleksi_pelajar, data.refleksi_guru,
+      data.disediakan_oleh || null, data.disemak_oleh || null,
+      id
+    ).run()
+    
+    return c.json({ success: true, message: 'Laporan mingguan berjaya dikemaskini' })
+  } catch (error) {
+    console.error('[ERROR] Update laporan mingguan failed:', error)
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
+// API: Delete laporan mingguan
+app.delete('/api/laporan-mingguan/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    
+    await c.env.DB.prepare('DELETE FROM laporan_mingguan WHERE id = ?').bind(id).run()
+    
+    return c.json({ success: true, message: 'Laporan mingguan berjaya dibuang' })
+  } catch (error) {
+    return c.json({ success: false, message: 'Ralat sistem' }, 500)
+  }
+})
+
 // ========== PAGE ROUTES ==========
 
 // Home page - Landing with two sections
